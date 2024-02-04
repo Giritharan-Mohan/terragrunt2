@@ -1,0 +1,59 @@
+
+
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      containers:
+      - name: jenkins
+        image: jenkins/jenkins:lts
+        ports:
+        - containerPort: 8080
+        - containerPort: 50000
+        resources:
+          limits:
+            cpu: "1"
+            memory: "2Gi" # Adjust according to your requirements
+          requests:
+            cpu: "0.5"
+            memory: "1Gi" # Adjust according to your requirements
+
+---
+
+# jenkins-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins
+spec:
+  selector:
+    app: jenkins
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+
+
+# steps
+
+# aws eks --region ap-south-1 update-kubeconfig --name eks-cluster
+
+# kubectl create namespace jenkins
+# kubectl apply -f jenkinsbasic.yaml
+
+
+# kubectl exec -it $(kubectl get pods --selector=app=jenkins -n jenkins --output=jsonpath='{.items[0].metadata.name}') -n jenkins -- cat /var/jenkins_home/secrets/initialAdminPassword
+
+

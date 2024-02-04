@@ -1,0 +1,3 @@
+
+aws service-quotas list-service-quotas --service-code ec2 --output json
+
